@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.odianyun.demo.mapper.SoMapper">
+    <select id="listSoPage" resultType="com.odianyun.demo.model.VO.SoVO">
+        select s.id, s.order_code, s.parent_order_code, s.order_status, s.merchant_id, s.merchant_name
+        ,s.store_id, s.store_name, s.order_create_time, s.order_remark_user, s.user_id, s.user_name
+        from so s
+        <if test="code !=null">
+            inner join so_item si on s.order_code = si.order_code
+        </if>
+        <where>
+            <if test="orderCode != null">
+                s.order_code = #{orderCode}
+            </if>
+            <if test="parentOrderCode != null">
+                and s.parent_order_code = #{parentOrderCode}
+            </if>
+            <if test="code != null">
+                and si.code = #{code}
+            </if>
+            <if test="storeId != null">
+                and s.store_id = #{storeId}
+            </if>
+            <if test="startOrderCreateTime != null">
+                and s.order_create_time &gt;= #{startOrderCreateTime}
+            </if>
+            <if test="endOrderCreateTime != null">
+                and s.order_create_time &lt;= #{endOrderCreateTime}
+            </if>
+            <if test="orderStatus != null">
+                and s.order_status = #{orderStatus}
+            </if>
+
+            <if test="isOrderRemarkUser != null">
+                <choose>
+                    <when test="isOrderRemarkUser == @com.odianyun.demo.constant.CommonConstant@YES">
+                        and s.order_remark_user is not null
+                    </when>
+                    <otherwise>
+                        and s.order_remark_user is null
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+
+    </select>
+
+    <update id="batchUpdateStatus">
+        <foreach collection="list" item="item" separator=";">
+            update so set order_status = #{item.orderStatus}
+            where order_code =#{item.orderCode}
+        </foreach>
+    </update>
+
+    <select id="listByOrderCodes" resultType="com.odianyun.demo.model.VO.SoVO">
+        select id, order_code, order_status
+        from so
+        where order_code in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        /*foreach中的值是从哪来的？
+            list中的值是从mapper中的集合传递过来
+        */
+    </select>
+
+</mapper>

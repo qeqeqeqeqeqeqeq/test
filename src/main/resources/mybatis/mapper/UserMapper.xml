@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.odianyun.demo.mapper.UserMapper">
+
+    <select id="getById" resultType="com.odianyun.demo.model.User">
+        select id,mobile,password,create_time,update_time
+        from u_user
+        where id=#{id}
+    </select>
+
+    <update id="update">
+        update u_user set update_time = now()
+        where id = #{id}
+    </update>
+
+    <update id="updateParam">
+        update u_user set mobile = #{mobile}, password = #{password
+        where id = #{id}
+    </update>
+
+    <update id="batchUpdate">
+        <foreach collection="list" item="user" separator=";">
+            UPDATE u_user
+            SET password = #{user.password}
+            WHERE id = #{user.id}
+        </foreach>
+    </update>
+</mapper>
